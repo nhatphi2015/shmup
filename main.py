@@ -78,6 +78,7 @@ class Player(pygame.sprite.Sprite):
         self.hidden = False
         self.hide_timer = pygame.time.get_ticks()
 
+    # unhide
     def update(self):
         # unhide if
         if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:
@@ -99,6 +100,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
 
+    # Shoot
     def shoot(self):
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay:
@@ -108,10 +110,11 @@ class Player(pygame.sprite.Sprite):
             bullets.add(bullet)
             shoot_sound.play()
 
+    # hide
     def hide(self):
         # hide the player temporariily
         self.hidden = True
-        self_timer = pygame.time.get_ticks()
+        self.hide_timer = pygame.time.get_ticks()
         self.rect.center = (WIDTH / 2, HEIGHT + 200)
 
 # Mob class
@@ -165,6 +168,22 @@ class Bullet(pygame.sprite.Sprite):
     def update(self):
         self.rect.y += self.speedy
         if self.rect.bottom < 0:
+            self.kill()
+
+# Pow class
+class Pow(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.choice(['shield', 'gun'])
+        self.image = powerup_images[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speedy = 3
+
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT:
             self.kill()
 
 # Explosion class
@@ -224,6 +243,9 @@ for i in range (8):
     filename = 'regularExplosion0{}_transparent.png'.format(i)
     img.set_colorkey(BLACK)
     explosion_anim['player'].append(img)
+powerup_images = {}
+powerup_images['shield'] = pygame.image.load(path.join(img_dir, 'Bolt.png')).convert_alpha()
+powerup_images['gun'] = pygame.image.load(path.join(img_dir, 'POWER.png')).convert_alpha()
 
 # Load sounds
 shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Shoot.wav'))
@@ -237,10 +259,12 @@ pygame.mixer.music.set_volume(0.4)
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
+powerups = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 for i in range(8):
     newmob()
+
 score = 0
 pygame.mixer.music.play(loops = -1)
 
@@ -264,6 +288,10 @@ while running:
         random.choice(expl_sound).play()
         expl = Explosion(hit.rect.center, 'lg')
         all_sprites.add(expl)
+        if random.random() > 0.8:
+            pow = Pow(hit.rect.center)
+            all_sprites.add(pow)
+            powerups.add(pow)
         newmob()
 
     # Mob hits player
@@ -279,7 +307,15 @@ while running:
             player.hide()
             player.lives -=1
             player.sheild = 250
-            
+
+    # check to see if a player hit a powerup
+    hits = pygame.sprite.spritecollide(player, powerups, True)
+    for hit in hits:
+        if hit.type == 'shield':
+            player.sheild += 20
+            if player.sheild >= 100:
+                player.sheild = 100
+
     # if the player died and explosion has finished play
     if player.lives ==0 and not death_explosion.alive():
         running = False
