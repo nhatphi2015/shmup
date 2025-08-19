@@ -9,7 +9,7 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 WIDTH = 600
 HEIGHT = 800
 FPS = 60
-POWERUP_TIME = 5000
+POWERUP_TIME = 3000
 
 # Colors
 WHITE = (255, 255, 255)
@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
 
     # unhide
     def update(self):
-        # timeout powerup
+        # timeout
         if self.power >= 2 and pygame.time.get_ticks() - self.power_time > POWERUP_TIME:
             self.power -=1
             self.power_time = pygame.time.get_ticks()
@@ -120,16 +120,18 @@ class Player(pygame.sprite.Sprite):
             self.last_shot = now
             if self.power == 1:
                 bullet = Bullet(self.rect.centerx, self.rect.top)
+                self.shoot_delay = 180
                 all_sprites.add(bullet)
                 bullets.add(bullet)
                 shoot_sound.play()
             if self.power >= 2:
                 bullet1 = Bullet(self.rect.left, self.rect.centery)
-                bullet2 = Bullet(self.rect.right, self.rect.centery)
+                # bullet2 = Bullet(self.rect.right, self.rect.centery)
+                self.shoot_delay = 140
                 all_sprites.add(bullet1)
-                all_sprites.add(bullet2)
+                # all_sprites.add(bullet2)
                 bullets.add(bullet1)
-                bullets.add(bullet2)
+                # bullets.add(bullet2)
                 shoot_sound.play()
 
     # hide
@@ -329,7 +331,7 @@ while running:
         random.choice(expl_sound).play()
         expl = Explosion(hit.rect.center, 'lg')
         all_sprites.add(expl)
-        if random.random() > 0.8:
+        if random.random() > 0.9:
             pow = Pow(hit.rect.center)
             all_sprites.add(pow)
             powerups.add(pow)
