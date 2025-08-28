@@ -127,7 +127,7 @@ class Player(pygame.sprite.Sprite):
             if self.power >= 2:
                 bullet1 = Bullet(self.rect.left, self.rect.centery)
                 # bullet2 = Bullet(self.rect.right, self.rect.centery)
-                self.shoot_delay = 140
+                self.shoot_delay = 120
                 all_sprites.add(bullet1)
                 # all_sprites.add(bullet2)
                 bullets.add(bullet1)
