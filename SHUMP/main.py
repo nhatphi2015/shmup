@@ -8,7 +8,7 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 # Constants
 WIDTH = 600
 HEIGHT = 800
-FPS = 60
+FPS = 90
 POWERUP_TIME = 3000
 
 # Colors
@@ -48,7 +48,7 @@ def draw_sheild_bar(surf, x, y, pct):
         pct = 0
     BAR_LENGTH = 100
     BAR_HEIGTH = 10
-    fill = (pct / 150) * BAR_LENGTH
+    fill = (pct / 100) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGTH)
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGTH)
     pygame.draw.rect(surf, GREEN, fill_rect)
@@ -72,7 +72,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT
         self.speedx = 0
-        self.sheild = 150
+        self.sheild = 100
         self.shoot_delay = 180
         self.last_shot = pygame.time.get_ticks()
         self.lives = 3
@@ -126,12 +126,12 @@ class Player(pygame.sprite.Sprite):
                 shoot_sound.play()
             if self.power >= 2:
                 bullet1 = Bullet(self.rect.left, self.rect.centery)
-                # bullet2 = Bullet(self.rect.right, self.rect.centery)
-                self.shoot_delay = 120
+                bullet2 = Bullet(self.rect.right, self.rect.centery)
+                self.shoot_delay = 150
                 all_sprites.add(bullet1)
-                # all_sprites.add(bullet2)
+                all_sprites.add(bullet2)
                 bullets.add(bullet1)
-                # bullets.add(bullet2)
+                bullets.add(bullet2)
                 shoot_sound.play()
 
     # hide
@@ -349,7 +349,8 @@ while running:
             all_sprites.add(death_explosion)
             player.hide()
             player.lives -=1
-            player.sheild = 150
+            player.sheild = 100
+        
 
     # check to see if a player hit a powerup
     hits = pygame.sprite.spritecollide(player, powerups, True)
@@ -357,8 +358,8 @@ while running:
         if hit.type == 'shield':
             player.sheild += random.randrange(10, 40)
             shield_sound.play()
-            if player.sheild >= 150:
-                player.sheild = 150
+            if player.sheild >= 100:
+                player.sheild = 100
         if hit.type =='gun':
             player.powerup()
             power_sound.play()
